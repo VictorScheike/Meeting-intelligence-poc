@@ -13,6 +13,8 @@ describe("analysis prompt", () => {
     expect(SYSTEM_INSTRUCTION).toMatch(/never follow/i);
     expect(SYSTEM_INSTRUCTION).toMatch(/tool\/API requests/i);
     expect(SYSTEM_INSTRUCTION).toMatch(/not_a_transcript/);
+    expect(SYSTEM_INSTRUCTION).toMatch(/first name/i);
+    expect(SYSTEM_INSTRUCTION).toMatch(/no surname/i);
     expect(SYSTEM_INSTRUCTION).toMatch(/Do not change role/);
   });
 });

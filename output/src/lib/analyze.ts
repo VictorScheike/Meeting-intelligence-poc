@@ -30,14 +30,17 @@ Create a concise 4-6 sentence summary for somebody who missed the meeting.
 Create a conclusion focused on decisions and the organisation-level next move,
 not another recap.
 
-Include only genuine next steps that the transcript assigns to a named person.
-Include a due date only when it is actually stated. Never invent owners,
-deadlines, decisions or tasks. If ownership is unclear, do not assign the task
-to a person.
+Include every genuine next step the notes assign to a person. A first name
+alone is enough — do not skip someone because they have no surname. Use the
+name as it appears in the notes, including Danish characters.
 
-For each next step, include sources: one to three short verbatim quotes copied
-from the transcript that support that task. Quotes must appear in the
-transcript. Do not invent or paraphrase quotes.`;
+Include a due date only when it is actually stated. Never invent owners,
+deadlines, decisions or tasks. If ownership is unclear, omit that task rather
+than guessing.
+
+For each next step, include sources: one short verbatim quote copied from the
+transcript that supports that task (a second quote only if needed). Quotes must
+appear in the transcript. Do not invent or paraphrase quotes.`;
 
 export class AnalysisError extends Error {
   status: number;
@@ -76,7 +79,7 @@ export async function extractMeetingReport(
       body: JSON.stringify({
         model: OPENAI_MODEL,
         temperature: 0,
-        max_tokens: 4000,
+        max_tokens: 12000,
         messages: [
           { role: "system", content: SYSTEM_INSTRUCTION },
           { role: "user", content: wrapUntrustedTranscript(transcript) },

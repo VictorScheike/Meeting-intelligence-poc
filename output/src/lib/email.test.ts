@@ -201,4 +201,19 @@ describe("brief template variables", () => {
     expect(variables.NEXT_STEPS_TEXT.length).toBeLessThanOrEqual(TEMPLATE_STRING_MAX);
     expect(variables.NEXT_STEPS_HTML).toContain("Additional next steps were omitted");
   });
+
+  it("keeps first-name-only people and the last person in a typical whole brief", () => {
+    const firstNames: MeetingReport = {
+      ...report,
+      people: ["Line", "Michael", "Sofie", "Victor", "Ann"].map((name) => ({
+        name,
+        nextSteps: [{ text: `${name} will share the timeline this week` }],
+      })),
+    };
+    const variables = briefTemplateVariables(firstNames);
+    expect(variables.NEXT_STEPS_HTML).toContain("Ann");
+    expect(variables.NEXT_STEPS_HTML).toContain("Victor");
+    expect(variables.NEXT_STEPS_HTML).not.toContain("Additional next steps were omitted");
+    expect(variables.NEXT_STEPS_TEXT).toContain("Ann");
+  });
 });

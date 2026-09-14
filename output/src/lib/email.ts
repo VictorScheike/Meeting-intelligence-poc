@@ -224,19 +224,39 @@ function nextStepsEmptyHtml(message: string): string {
   return `<p style="font-family:Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;color:#5c6573;margin-top:0;margin-right:0;margin-bottom:0;margin-left:0;">${escapeHtml(message)}</p>`;
 }
 
+const FONT = "Arial,Helvetica,sans-serif";
+
 function personHeadingHtml(name: string): string {
-  return `<h3 style="font-family:Arial, Helvetica, sans-serif;font-size:16px;line-height:24px;font-weight:bold;color:#152033;margin-top:0;margin-right:0;margin-bottom:12px;margin-left:0;">${escapeHtml(name)}</h3>`;
+  return `<p style="font-family:${FONT};font-size:16px;line-height:24px;font-weight:bold;color:#152033;margin:0 0 8px 0;">${escapeHtml(name)}</p>`;
 }
 
 function stepRowHtml(step: EmailPerson["nextSteps"][number]): string {
   const due = step.due
-    ? `<p style="font-family:Arial, Helvetica, sans-serif;font-size:12px;line-height:20px;color:#5c6573;margin-top:4px;margin-right:0;margin-bottom:0;margin-left:0;">Due ${escapeHtml(step.due)}</p>`
+    ? `<br><span style="font-size:12px;line-height:18px;color:#5c6573;">Due ${escapeHtml(step.due)}</span>`
     : "";
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr><td style="border-left-width:3px;border-left-style:solid;border-left-color:#1d6a65;padding-left:12px;"><p style="font-family:Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;color:#152033;margin-top:0;margin-right:0;margin-bottom:0;margin-left:0;">${escapeHtml(step.text)}</p>${due}</td></tr></table>`;
+  return `<p style="font-family:${FONT};font-size:14px;line-height:22px;color:#152033;margin:0 0 8px 0;padding-left:10px;border-left:3px solid #1d6a65;">${escapeHtml(step.text)}${due}</p>`;
 }
 
 function wrapPersonHtml(inner: string): string {
-  return `<div style="margin-bottom:20px;">${inner}</div>`;
+  return `<div style="margin:0 0 16px 0;">${inner}</div>`;
+}
+
+function withOmitted(html: string, omitted: string): string {
+  if ((html + omitted).length <= TEMPLATE_STRING_MAX) {
+    return html + omitted;
+  }
+  const lastBlock = html.lastIndexOf('<div style="margin:0 0 16px 0;">');
+  if (lastBlock > 0) {
+    const shorter = html.slice(0, lastBlock);
+    if (shorter.length > 0 && (shorter + omitted).length <= TEMPLATE_STRING_MAX) {
+      return shorter + omitted;
+    }
+  }
+  const budget = TEMPLATE_STRING_MAX - omitted.length;
+  if (budget <= 0) {
+    return omitted.slice(0, TEMPLATE_STRING_MAX);
+  }
+  return html.slice(0, budget) + omitted;
 }
 
 function renderNextStepsHtml(people: EmailPerson[], emptyHtml: string): string {
@@ -246,6 +266,7 @@ function renderNextStepsHtml(people: EmailPerson[], emptyHtml: string): string {
 
   const omitted = nextStepsEmptyHtml("Additional next steps were omitted from this email.");
   let html = "";
+  let omittedAny = false;
 
   for (const person of people) {
     let inner = personHeadingHtml(person.name);
@@ -253,12 +274,10 @@ function renderNextStepsHtml(people: EmailPerson[], emptyHtml: string): string {
 
     for (const step of person.nextSteps) {
       const nextInner = inner + stepRowHtml(step);
-      const candidate = html + wrapPersonHtml(nextInner) + omitted;
+      const candidate = html + wrapPersonHtml(nextInner);
       if (candidate.length > TEMPLATE_STRING_MAX) {
-        if (addedStep) {
-          html += wrapPersonHtml(inner);
-        }
-        return html ? html + omitted : emptyHtml;
+        omittedAny = true;
+        break;
       }
       inner = nextInner;
       addedStep = true;
@@ -267,8 +286,14 @@ function renderNextStepsHtml(people: EmailPerson[], emptyHtml: string): string {
     if (addedStep) {
       html += wrapPersonHtml(inner);
     }
+    if (omittedAny) {
+      break;
+    }
   }
 
+  if (omittedAny) {
+    return html ? withOmitted(html, omitted) : emptyHtml;
+  }
   return html || emptyHtml;
 }
 
@@ -279,24 +304,31 @@ function renderNextStepsText(people: EmailPerson[], emptyText: string): string {
 
   const omitted = "Additional next steps were omitted from this email.";
   const blocks: string[] = [];
+  let omittedAny = false;
 
   for (const person of people) {
     const lines = [person.name];
     for (const step of person.nextSteps) {
       lines.push(step.due ? `- ${step.text} (Due ${step.due})` : `- ${step.text}`);
-      const candidate = [...blocks, lines.join("\n"), omitted].join("\n\n");
+      const candidate = [...blocks, lines.join("\n")].join("\n\n");
       if (candidate.length > TEMPLATE_STRING_MAX) {
         lines.pop();
-        if (lines.length > 1) {
-          blocks.push(lines.join("\n"));
-        }
-        return blocks.length > 0 ? `${blocks.join("\n\n")}\n\n${omitted}` : emptyText;
+        omittedAny = true;
+        break;
       }
     }
     if (lines.length > 1) {
       blocks.push(lines.join("\n"));
     }
+    if (omittedAny) {
+      break;
+    }
   }
 
-  return blocks.join("\n\n") || emptyText;
+  const text = blocks.join("\n\n");
+  if (omittedAny) {
+    const withNote = `${text}\n\n${omitted}`;
+    return text && withNote.length <= TEMPLATE_STRING_MAX ? withNote : text || emptyText;
+  }
+  return text || emptyText;
 }

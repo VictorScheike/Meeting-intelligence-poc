@@ -3,7 +3,7 @@ import { z } from "zod";
 const nextStepSchema = z.object({
   text: z.string().min(1).max(400),
   due: z.union([z.string().max(80), z.null()]),
-  sources: z.optional(z.array(z.string().min(1).max(400)).max(8)),
+  sources: z.optional(z.array(z.string().min(1).max(400)).max(3)),
 });
 
 const personSchema = z.object({
@@ -150,7 +150,7 @@ export const OPENAI_REPORT_JSON_SCHEMA = {
                     },
                     sources: {
                       type: "array",
-                      maxItems: 8,
+                      maxItems: 3,
                       items: { type: "string", maxLength: 400 },
                     },
                   },
