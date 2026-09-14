@@ -12,7 +12,7 @@ Workplace meetings produce long transcripts that are hard to scan. Someone who m
 
 ## What this product does
 
-A signed-in user chooses one of the three included examples or uploads a `.txt` transcript. The browser sends the text as JSON. A Cloudflare Worker validates the session and transcript, calls OpenAI with a server-owned prompt and schema, validates the JSON again, and returns a meeting brief.
+A signed-in user can open one of three prepared meeting briefs, or upload a `.txt` transcript for live analysis. Uploads send JSON to the Worker. The Worker validates the session and transcript, calls OpenAI with a server-owned prompt and schema, validates the JSON again, and returns a meeting brief. The example cards never fetch or publish the original transcripts; they render the committed reports in `results/`.
 
 The brief always uses one schema: title, date, meeting type, a short summary, a decision-focused conclusion, and next steps grouped by named person. Due dates appear only when the transcript actually states them.
 
@@ -35,21 +35,21 @@ cd output
 npm run generate:results
 ```
 
-The command reads `../Input`, uses the same analysis function, system instruction and Zod schema as the live Worker, and refuses to write a file if validation fails.
+The command reads local `../Input` transcripts when regenerating reports on a machine that has them. Those files are not committed, not copied into `public/`, and not required to run or deploy the app.
 
 ## Architecture
 
 ```text
 Password login
-  -> choose an example or upload one .txt file
-  -> POST /api/analyze { transcript }
+  -> open a prepared example brief, or upload one .txt file
+  -> uploads only: POST /api/analyze { transcript }
   -> Worker checks the signed session and transcript
   -> OpenAI returns structured JSON
   -> Zod validates the result
   -> the UI renders the brief
 ```
 
-The original file is never uploaded as multipart data and is never stored. Checklist ticks live in `localStorage` only.
+Original source transcripts are not part of the deployed app. Uploaded files are sent as JSON only and are never stored. Checklist ticks live in `localStorage` only.
 
 ## Technology
 

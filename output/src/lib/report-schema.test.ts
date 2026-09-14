@@ -42,7 +42,7 @@ describe("model output validation", () => {
         },
         {
           name: "Thomas Nielsen",
-          nextSteps: [{ text: "Document mobile use cases", due: null }],
+          nextSteps: [{ text: "Document mobile use cases", due: "null" }],
         },
       ],
     });

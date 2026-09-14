@@ -2,24 +2,23 @@ import { CheckCircle2, ListChecks, Share2 } from "lucide-react";
 import { ExampleMeetingCard } from "@/components/ExampleMeetingCard.tsx";
 import { TranscriptUpload } from "@/components/TranscriptUpload.tsx";
 import { EXAMPLE_MEETINGS, type ExampleMeeting } from "@/lib/examples.ts";
+import type { MeetingReport } from "@/lib/report-schema.ts";
 
 type HomePageProps = {
   busy: boolean;
+  onOpenExample: (report: MeetingReport) => void;
   onAnalyse: (transcript: string) => void;
   onInvalid: (message: string) => void;
 };
 
-export function HomePage({ busy, onAnalyse, onInvalid }: HomePageProps) {
-  function analyseExample(meeting: ExampleMeeting) {
-    void (async () => {
-      const response = await fetch(`/examples/${meeting.fileName}`);
-      if (!response.ok) {
-        onInvalid("The example transcript could not be loaded.");
-        return;
-      }
-      const transcript = await response.text();
-      onAnalyse(transcript);
-    })();
+export function HomePage({
+  busy,
+  onOpenExample,
+  onAnalyse,
+  onInvalid,
+}: HomePageProps) {
+  function openExample(meeting: ExampleMeeting) {
+    onOpenExample(meeting.report);
   }
 
   return (
@@ -29,8 +28,8 @@ export function HomePage({ busy, onAnalyse, onInvalid }: HomePageProps) {
           Get the meeting outcome without rereading the transcript.
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          Analyse an example or upload a .txt transcript to produce a 30-second brief,
-          a decision-focused conclusion, and next steps grouped by person.
+          Open a prepared brief from one of the sample meetings, or upload your own
+          .txt transcript for a live analysis.
         </p>
         <ul className="mt-6 grid gap-3 sm:grid-cols-3">
           <Benefit icon={CheckCircle2} label="Quick brief" />
@@ -43,7 +42,8 @@ export function HomePage({ busy, onAnalyse, onInvalid }: HomePageProps) {
         <div>
           <h2 className="text-lg font-semibold">Try an example</h2>
           <p className="text-sm text-muted-foreground">
-            Each example uses the same authenticated analysis flow as an upload.
+            These cards open the committed meeting briefs. They do not upload or
+            expose the original transcripts.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -52,7 +52,7 @@ export function HomePage({ busy, onAnalyse, onInvalid }: HomePageProps) {
               key={meeting.id}
               meeting={meeting}
               disabled={busy}
-              onAnalyse={analyseExample}
+              onOpen={openExample}
             />
           ))}
         </div>

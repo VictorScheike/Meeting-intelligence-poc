@@ -18,13 +18,13 @@ const typeLabel = {
 type ExampleMeetingCardProps = {
   meeting: ExampleMeeting;
   disabled?: boolean;
-  onAnalyse: (meeting: ExampleMeeting) => void;
+  onOpen: (meeting: ExampleMeeting) => void;
 };
 
 export function ExampleMeetingCard({
   meeting,
   disabled,
-  onAnalyse,
+  onOpen,
 }: ExampleMeetingCardProps) {
   return (
     <Card className="flex h-full flex-col transition-shadow hover:shadow-md">
@@ -40,9 +40,9 @@ export function ExampleMeetingCard({
         <Button
           className="w-full"
           disabled={disabled}
-          onClick={() => onAnalyse(meeting)}
+          onClick={() => onOpen(meeting)}
         >
-          Analyse meeting
+          Open brief
         </Button>
       </CardContent>
     </Card>

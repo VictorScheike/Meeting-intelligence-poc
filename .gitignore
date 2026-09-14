@@ -1,5 +1,6 @@
 # Local case source material — never commit
 /Input/
+/output/public/examples/
 
 # Secrets and environment files
 .env

@@ -93,6 +93,10 @@ export default function App() {
         {view === "home" ? (
           <HomePage
             busy={false}
+            onOpenExample={(nextReport) => {
+              setReport(nextReport);
+              setView("result");
+            }}
             onAnalyse={(transcript) => void runAnalysis(transcript)}
             onInvalid={(message) => toast.error(message)}
           />

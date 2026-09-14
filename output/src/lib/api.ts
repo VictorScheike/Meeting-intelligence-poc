@@ -70,14 +70,6 @@ export async function analyzeTranscript(transcript: string): Promise<AnalyzeResu
   return (await response.json()) as AnalyzeResult;
 }
 
-export async function fetchExampleTranscript(fileName: string): Promise<string> {
-  const response = await fetch(`/examples/${fileName}`);
-  if (!response.ok) {
-    throw new RequestError("The example transcript could not be loaded.", response.status);
-  }
-  return response.text();
-}
-
 export function isMeetingReport(value: AnalyzeResult): value is MeetingReport {
   return value.ok;
 }

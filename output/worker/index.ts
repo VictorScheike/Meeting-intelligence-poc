@@ -68,6 +68,8 @@ app.use("/api/*", async (c, next) => {
   await next();
 });
 
+app.all("/examples/*", (c) => c.json({ error: "Not found." }, 404));
+
 app.post("/api/login", async (c) => {
   if (!hasJsonContentType(c.req.raw)) {
     return jsonError("Content-Type must be application/json.", 400);

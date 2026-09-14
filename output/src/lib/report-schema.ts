@@ -59,6 +59,14 @@ export type AnalyzeResult = MeetingReport | NotTranscript;
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;
 
+export function usableDue(value: string | null | undefined): string | undefined {
+  const due = value?.trim();
+  if (!due || due.toLowerCase() === "null") {
+    return undefined;
+  }
+  return due;
+}
+
 export function normalizeAnalyzeResult(
   value: z.infer<typeof analyzeResultSchema>,
 ): AnalyzeResult {
@@ -76,7 +84,7 @@ export function normalizeAnalyzeResult(
     people: value.people.map((person) => ({
       name: person.name,
       nextSteps: person.nextSteps.map((step) => {
-        const due = step.due?.trim();
+        const due = usableDue(step.due);
         return due ? { text: step.text, due } : { text: step.text };
       }),
     })),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPersonMarkdown, formatReportMarkdown } from "./markdown.ts";
+import { formatPersonMarkdown, formatReportMarkdown, parseReportMarkdown } from "./markdown.ts";
 import type { MeetingReport } from "./report-schema.ts";
 
 const report: MeetingReport = {
@@ -53,5 +53,29 @@ Build an integration framework before one-off connectors.
     expect(formatReportMarkdown(emptyReport)).toContain(
       "_No named next steps were assigned in this transcript._",
     );
+  });
+
+  it("round-trips a formatted report", () => {
+    expect(parseReportMarkdown(formatReportMarkdown(report), "internal")).toEqual(report);
+  });
+
+  it("drops placeholder null due dates from generated markdown", () => {
+    const markdown = `# Roadmap
+15 January 2024
+
+## Short summary
+Summary text for somebody who missed the meeting.
+
+## Conclusion
+The organisation will pursue the framework.
+
+## Next steps
+
+### Line Petersen
+- [ ] Share a detailed timeline (null)
+`;
+    expect(parseReportMarkdown(markdown, "internal").people[0]?.nextSteps).toEqual([
+      { text: "Share a detailed timeline" },
+    ]);
   });
 });
