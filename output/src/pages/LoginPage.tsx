@@ -77,8 +77,7 @@ export function LoginPage({ onSuccess, onError }: LoginPageProps) {
               </Button>
             </form>
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              The OpenAI key stays server-side and uploaded transcripts are not stored
-              by this application.
+              Uploaded transcripts are not stored by this application.
             </p>
           </CardContent>
         </Card>

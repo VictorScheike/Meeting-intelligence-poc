@@ -2,9 +2,9 @@
 
 Turn meeting transcripts into a brief someone can actually use: the outcome in 30 seconds, next steps by person, and a report that can be copied or emailed without reformatting.
 
-Live URL: deploy this Worker, then replace this line with the `*.workers.dev` address. A custom domain such as `meeting.victorscheike.com` can be attached later the same way as other Cloudflare sites.
+Live demo: https://meeting-intelligence.victorscheike.com
 
-Demo password: the shared `LOGIN_PASSWORD` Worker secret. It is not stored in this repository.
+The demo is password protected. The password is shared separately with reviewers and is stored only as a Cloudflare Worker secret. It is not included in this repository.
 
 ## The problem
 
