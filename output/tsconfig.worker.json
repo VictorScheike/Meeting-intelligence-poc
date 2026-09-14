@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
+    "types": ["./worker-configuration.d.ts", "vite/client"],
+    "lib": ["ES2023"]
+  },
+  "include": [
+    "worker",
+    "src/lib/analyze.ts",
+    "src/lib/constants.ts",
+    "src/lib/markdown.ts",
+    "src/lib/report-schema.ts",
+    "src/lib/session.ts",
+    "src/lib/transcript.ts"
+  ]
+}
