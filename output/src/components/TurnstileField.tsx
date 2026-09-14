@@ -37,7 +37,7 @@ export const TurnstileField = forwardRef<TurnstileFieldHandle, TurnstileFieldPro
       void loadTurnstileScript()
         .then(() => {
           const container = containerRef.current;
-          if (cancelled || !container || !window.turnstile) {
+          if (cancelled || !container || typeof window.turnstile?.render !== "function") {
             return;
           }
           widgetId = window.turnstile.render(container, {

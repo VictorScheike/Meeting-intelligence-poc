@@ -12,22 +12,28 @@ export type TurnstileApi = {
   render: (container: HTMLElement, options: TurnstileRenderOptions) => string;
   reset: (widgetId: string) => void;
   remove: (widgetId: string) => void;
-  ready: (callback: () => void) => void;
 };
 
 declare global {
   interface Window {
     turnstile?: TurnstileApi;
+    onMeetingIntelligenceTurnstileLoad?: () => void;
   }
 }
+
+export const TURNSTILE_ONLOAD_CALLBACK = "onMeetingIntelligenceTurnstileLoad";
 
 const SCRIPT_SRC =
   "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
 let loading: Promise<void> | undefined;
 
+export function isTurnstileApiReady(): boolean {
+  return typeof window.turnstile?.render === "function";
+}
+
 export function loadTurnstileScript(): Promise<void> {
-  if (window.turnstile) {
+  if (isTurnstileApiReady()) {
     return Promise.resolve();
   }
   if (loading) {
@@ -35,11 +41,25 @@ export function loadTurnstileScript(): Promise<void> {
   }
 
   loading = new Promise<void>((resolve, reject) => {
+    const finish = () => {
+      if (!isTurnstileApiReady()) {
+        reject(new Error("Turnstile failed to load."));
+        return;
+      }
+      resolve();
+    };
+
+    window.onMeetingIntelligenceTurnstileLoad = finish;
+
     const existing = document.querySelector<HTMLScriptElement>(
       "script[data-turnstile-script]",
     );
     if (existing) {
-      existing.addEventListener("load", () => resolve(undefined), { once: true });
+      if (isTurnstileApiReady()) {
+        finish();
+        return;
+      }
+      existing.addEventListener("load", finish, { once: true });
       existing.addEventListener(
         "error",
         () => reject(new Error("Turnstile failed to load.")),
@@ -49,21 +69,15 @@ export function loadTurnstileScript(): Promise<void> {
     }
 
     const script = document.createElement("script");
-    script.src = SCRIPT_SRC;
+    script.src = `${SCRIPT_SRC}&onload=${TURNSTILE_ONLOAD_CALLBACK}`;
     script.async = true;
     script.defer = true;
     script.dataset.turnstileScript = "true";
-    script.onload = () => resolve(undefined);
     script.onerror = () => reject(new Error("Turnstile failed to load."));
     document.head.appendChild(script);
-  }).then(async () => {
-    const api = window.turnstile;
-    if (!api) {
-      throw new Error("Turnstile failed to load.");
-    }
-    await new Promise<void>((resolve) => {
-      api.ready(() => resolve(undefined));
-    });
+  }).catch((error: unknown) => {
+    loading = undefined;
+    throw error;
   });
 
   return loading;
