@@ -2,16 +2,20 @@
   "extends": "./tsconfig.node.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
-    "types": ["./worker-configuration.d.ts", "vite/client"],
-    "lib": ["ES2023"]
+    "types": ["./worker-configuration.d.ts", "vite/client", "react"],
+    "lib": ["ES2023", "DOM"],
+    "jsx": "react-jsx"
   },
   "include": [
     "worker",
     "src/lib/analyze.ts",
     "src/lib/constants.ts",
+    "src/lib/email.ts",
+    "src/lib/examples.ts",
     "src/lib/markdown.ts",
     "src/lib/report-schema.ts",
     "src/lib/session.ts",
-    "src/lib/transcript.ts"
+    "src/lib/transcript.ts",
+    "src/lib/turnstile.ts"
   ]
 }

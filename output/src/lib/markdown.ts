@@ -28,7 +28,7 @@ export function formatReportMarkdown(report: MeetingReport): string {
   );
 
   if (peopleWithSteps.length === 0) {
-    lines.push("", "_No named next steps were assigned in this transcript._");
+    lines.push("", "_No named next steps were assigned in this brief._");
   } else {
     for (const person of peopleWithSteps) {
       lines.push("", `### ${person.name}`);

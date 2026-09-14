@@ -37,11 +37,13 @@
   body,
   #root {
     min-height: 100%;
+    overflow-x: clip;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
     margin: 0;
+    overflow-wrap: break-word;
   }
 }
 

@@ -3,6 +3,7 @@ import { z } from "zod";
 const nextStepSchema = z.object({
   text: z.string().min(1).max(400),
   due: z.union([z.string().max(80), z.null()]),
+  sources: z.optional(z.array(z.string().min(1).max(400)).max(8)),
 });
 
 const personSchema = z.object({
@@ -32,10 +33,15 @@ export const analyzeResultSchema = z.discriminatedUnion("ok", [
 
 export const loginRequestSchema = z.strictObject({
   password: z.string().min(1).max(200),
+  "cf-turnstile-response": z.string().min(1).max(2048),
 });
 
 export const analyzeRequestSchema = z.strictObject({
   transcript: z.string(),
+});
+
+export const analyzeExampleRequestSchema = z.strictObject({
+  exampleId: z.enum(["roadmap", "nordea", "payments"]),
 });
 
 export type MeetingReport = {
@@ -50,6 +56,7 @@ export type MeetingReport = {
     nextSteps: Array<{
       text: string;
       due?: string;
+      sources?: string[];
     }>;
   }>;
 };
@@ -85,7 +92,14 @@ export function normalizeAnalyzeResult(
       name: person.name,
       nextSteps: person.nextSteps.map((step) => {
         const due = usableDue(step.due);
-        return due ? { text: step.text, due } : { text: step.text };
+        const sources = (step.sources ?? [])
+          .map((quote) => quote.trim())
+          .filter((quote) => quote.length > 0);
+        return {
+          text: step.text,
+          ...(due ? { due } : {}),
+          ...(sources.length > 0 ? { sources } : {}),
+        };
       }),
     })),
   };
@@ -134,8 +148,13 @@ export const OPENAI_REPORT_JSON_SCHEMA = {
                     due: {
                       anyOf: [{ type: "string", maxLength: 80 }, { type: "null" }],
                     },
+                    sources: {
+                      type: "array",
+                      maxItems: 8,
+                      items: { type: "string", maxLength: 400 },
+                    },
                   },
-                  required: ["text", "due"],
+                  required: ["text", "due", "sources"],
                 },
               },
             },

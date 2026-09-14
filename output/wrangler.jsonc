@@ -3,6 +3,7 @@
 	"name": "meeting-intelligence",
 	"main": "worker/index.ts",
 	"compatibility_date": "2026-09-13",
+	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
 		"not_found_handling": "single-page-application",
 		"run_worker_first": ["/api/*", "/examples/*"]
@@ -10,5 +11,19 @@
 	"observability": {
 		"enabled": true
 	},
+	"vars": {
+		"TURNSTILE_HOSTNAMES": "meeting-intelligence.victorscheike.com",
+		"RESEND_TEMPLATE_ID": "meeting-brief"
+	},
+	"ratelimits": [
+		{
+			"name": "EMAIL_RATE_LIMIT",
+			"namespace_id": "2001",
+			"simple": {
+				"limit": 5,
+				"period": 60
+			}
+		}
+	],
 	"upload_source_maps": true
 }

@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 
 const MESSAGES = [
-  "Turning the transcript into a clear meeting brief...",
+  "Turning the meeting into a clear brief...",
   "Identifying decisions",
   "Organising next steps",
 ];

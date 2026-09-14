@@ -1,6 +1,7 @@
 # Local case source material — never commit
 /Input/
 /output/public/examples/
+/output/worker/example-transcripts/*.txt
 
 # Secrets and environment files
 .env

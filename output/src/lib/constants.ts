@@ -5,4 +5,3 @@ export const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 export const SESSION_COOKIE_NAME = "mi_session";
 export const OPENAI_TIMEOUT_MS = 40_000;
 export const OPENAI_MODEL = "gpt-4o-mini";
-export const MAILTO_URL_LIMIT = 1800;

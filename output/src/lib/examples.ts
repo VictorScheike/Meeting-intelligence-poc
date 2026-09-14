@@ -1,9 +1,3 @@
-import roadmapReport from "../../results/q1-2024-product-roadmap.md?raw";
-import nordeaReport from "../../results/nordea-implementation-kickoff.md?raw";
-import paymentsReport from "../../results/payment-service-architecture-review.md?raw";
-import { parseReportMarkdown } from "./markdown.ts";
-import type { MeetingReport } from "./report-schema.ts";
-
 export const EXAMPLE_MEETINGS = [
   {
     id: "roadmap",
@@ -12,7 +6,6 @@ export const EXAMPLE_MEETINGS = [
     meetingType: "internal",
     description:
       "Internal planning on Q1 priorities: an integration framework with Economic support, responsive mobile access, and reporting improvements.",
-    report: parseReportMarkdown(roadmapReport, "internal"),
   },
   {
     id: "nordea",
@@ -21,7 +14,6 @@ export const EXAMPLE_MEETINGS = [
     meetingType: "client",
     description:
       "Client kickoff covering data migration, training, Azure AD SSO and a 15 March go-live ahead of fiscal year-end.",
-    report: parseReportMarkdown(nordeaReport, "client"),
   },
   {
     id: "payments",
@@ -30,16 +22,27 @@ export const EXAMPLE_MEETINGS = [
     meetingType: "technical",
     description:
       "Technical review of moving payment processing to asynchronous AWS SQS workers, with monitoring, circuit breakers and a versioned API.",
-    report: parseReportMarkdown(paymentsReport, "technical"),
   },
-] as const satisfies ReadonlyArray<{
-  id: string;
-  title: string;
-  date: string;
-  meetingType: MeetingReport["meetingType"];
-  description: string;
-  report: MeetingReport;
-}>;
+] as const;
 
 export type ExampleMeeting = (typeof EXAMPLE_MEETINGS)[number];
 export type MeetingType = ExampleMeeting["meetingType"];
+export type ExampleId = ExampleMeeting["id"];
+
+export function isExampleId(value: string): value is ExampleId {
+  return EXAMPLE_MEETINGS.some((meeting) => meeting.id === value);
+}
+
+export function exampleIdFromTitle(title: string): ExampleId | undefined {
+  const normalised = title.toLowerCase();
+  if (normalised.includes("nordea")) {
+    return "nordea";
+  }
+  if (normalised.includes("payment")) {
+    return "payments";
+  }
+  if (normalised.includes("roadmap")) {
+    return "roadmap";
+  }
+  return undefined;
+}

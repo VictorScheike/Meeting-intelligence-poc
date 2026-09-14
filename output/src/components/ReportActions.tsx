@@ -12,11 +12,11 @@ export function ReportActions({ disabled, onCopy, onEmail }: ReportActionsProps)
     <div className="flex flex-wrap gap-2">
       <Button variant="outline" size="sm" disabled={disabled} onClick={onCopy}>
         <Copy />
-        Copy report
+        Copy brief
       </Button>
       <Button variant="outline" size="sm" disabled={disabled} onClick={onEmail}>
         <Mail />
-        Email report
+        Send email
       </Button>
     </div>
   );

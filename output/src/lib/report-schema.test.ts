@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  analyzeExampleRequestSchema,
   analyzeRequestSchema,
   loginRequestSchema,
   parseModelOutput,
@@ -7,12 +8,23 @@ import {
 
 describe("request validation", () => {
   it("accepts a password payload and rejects unknown keys", () => {
-    expect(loginRequestSchema.parse({ password: "secret" })).toEqual({
+    expect(
+      loginRequestSchema.parse({
+        password: "secret",
+        "cf-turnstile-response": "turnstile-token",
+      }),
+    ).toEqual({
       password: "secret",
+      "cf-turnstile-response": "turnstile-token",
     });
-    expect(loginRequestSchema.safeParse({ password: "secret", extra: true }).success).toBe(
-      false,
-    );
+    expect(loginRequestSchema.safeParse({ password: "secret" }).success).toBe(false);
+    expect(
+      loginRequestSchema.safeParse({
+        password: "secret",
+        "cf-turnstile-response": "turnstile-token",
+        extra: true,
+      }).success,
+    ).toBe(false);
   });
 
   it("accepts a transcript payload and rejects unknown keys", () => {
@@ -22,6 +34,15 @@ describe("request validation", () => {
     expect(
       analyzeRequestSchema.safeParse({ transcript: "hello", model: "gpt" }).success,
     ).toBe(false);
+  });
+
+  it("accepts an example id and rejects unknown keys", () => {
+    expect(analyzeExampleRequestSchema.parse({ exampleId: "roadmap" })).toEqual({
+      exampleId: "roadmap",
+    });
+    expect(analyzeExampleRequestSchema.safeParse({ exampleId: "other" }).success).toBe(
+      false,
+    );
   });
 });
 
@@ -38,7 +59,13 @@ describe("model output validation", () => {
       people: [
         {
           name: "Line Petersen",
-          nextSteps: [{ text: "Share a detailed timeline", due: "end of week" }],
+          nextSteps: [
+            {
+              text: "Share a detailed timeline",
+              due: "end of week",
+              sources: ["I'd vote for the framework approach"],
+            },
+          ],
         },
         {
           name: "Thomas Nielsen",
@@ -57,7 +84,13 @@ describe("model output validation", () => {
       people: [
         {
           name: "Line Petersen",
-          nextSteps: [{ text: "Share a detailed timeline", due: "end of week" }],
+          nextSteps: [
+            {
+              text: "Share a detailed timeline",
+              due: "end of week",
+              sources: ["I'd vote for the framework approach"],
+            },
+          ],
         },
         {
           name: "Thomas Nielsen",

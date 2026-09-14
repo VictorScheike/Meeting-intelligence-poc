@@ -51,7 +51,7 @@ Build an integration framework before one-off connectors.
   it("handles an empty next-step list", () => {
     const emptyReport: MeetingReport = { ...report, people: [] };
     expect(formatReportMarkdown(emptyReport)).toContain(
-      "_No named next steps were assigned in this transcript._",
+      "_No named next steps were assigned in this brief._",
     );
   });
 

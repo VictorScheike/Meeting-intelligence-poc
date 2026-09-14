@@ -3,12 +3,12 @@ import { useId, useState, type DragEvent, type ChangeEvent } from "react";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { TRANSCRIPT_MAX_FILE_BYTES } from "@/lib/constants.ts";
-import { isTxtFileName } from "@/lib/transcript.ts";
+import { isTxtFileName, validateTranscript } from "@/lib/transcript.ts";
 import { cn } from "@/lib/utils.ts";
 
 type TranscriptUploadProps = {
   disabled?: boolean;
-  onGenerate: (transcript: string) => void;
+  onGenerate: (transcript: string, fileName: string) => void;
   onInvalid: (message: string) => void;
 };
 
@@ -33,7 +33,7 @@ export function TranscriptUpload({
       return;
     }
     if (!isTxtFileName(next.name)) {
-      onInvalid("Only .txt transcripts are supported.");
+      onInvalid("Only .txt Original meeting notes are supported.");
       return;
     }
     if (next.size > TRANSCRIPT_MAX_FILE_BYTES) {
@@ -67,17 +67,22 @@ export function TranscriptUpload({
 
   async function generate() {
     if (!file) {
-      onInvalid("Choose a .txt transcript first.");
+      onInvalid("Choose a .txt file of Original meeting notes first.");
       return;
     }
     const text = await file.text();
-    onGenerate(text);
+    const check = validateTranscript(text);
+    if (!check.ok) {
+      onInvalid(check.message);
+      return;
+    }
+    onGenerate(text, file.name);
   }
 
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader>
-        <CardTitle className="font-serif">Upload a transcript</CardTitle>
+        <CardTitle className="font-serif">Upload meeting notes</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <input
@@ -105,7 +110,8 @@ export function TranscriptUpload({
           <Upload className="mb-3 h-6 w-6 text-accent" aria-hidden="true" />
           <p className="text-sm font-medium">Drop a .txt file here, or browse</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            One file, UTF-8 text, 100 KB maximum. The original file is never stored.
+            Meeting notes or a transcript only. One UTF-8 .txt file, 100 KB maximum.
+            Files that are not a meeting are rejected before a brief is generated.
           </p>
         </label>
 
@@ -132,7 +138,7 @@ export function TranscriptUpload({
         ) : null}
 
         <Button className="w-full" disabled={disabled || !file} onClick={() => void generate()}>
-          Generate meeting brief
+          Generate Brief
         </Button>
       </CardContent>
     </Card>

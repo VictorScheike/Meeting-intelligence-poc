@@ -30,6 +30,9 @@ dist-ssr
 .env*
 !.env.example
 
+emails/.generated/
+
 
 # Private source transcripts — never publish
 public/examples/
+worker/example-transcripts/*.txt
