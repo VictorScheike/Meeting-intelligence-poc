@@ -20,7 +20,7 @@ Regenerate them with `npm run generate:results` from `output/` if you have the l
 
 ---
 
-## Your approach
+## My approach
 
 Meetings produce long notes that are hard to scan. The useful part is usually a handful of decisions and a list of who does what.
 
