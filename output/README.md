@@ -95,7 +95,7 @@ npm run deploy
 
 `TURNSTILE_HOSTNAMES` and `RESEND_TEMPLATE_ID` are not secrets. Production uses the values in `wrangler.jsonc`. Local `.dev.vars` should set `TURNSTILE_HOSTNAMES=localhost,127.0.0.1` so Siteverify accepts the local widget. `RESEND_TEMPLATE_ID` defaults to `meeting-brief`.
 
-`npm run deploy` builds the Vite app and deploys the Worker with static assets.
+`npm run deploy` builds the Vite app and deploys the Worker with static assets. After `wrangler secret put`, run `npm run deploy` again — secret uploads republish the Worker and can replace the built frontend with the Vite source `index.html`.
 
 ## Security choices
 

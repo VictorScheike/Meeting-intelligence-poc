@@ -3,6 +3,8 @@ import {
   MEETING_TRANSCRIPT_END,
   MEETING_TRANSCRIPT_START,
   PROMPT_INJECTION_MESSAGE,
+  expandPersonNames,
+  speakerRoster,
   validateTranscript,
   wrapUntrustedTranscript,
 } from "./transcript.ts";
@@ -93,7 +95,8 @@ describe("untrusted transcript wrapping", () => {
     expect(wrapped).toContain(MEETING_TRANSCRIPT_END);
     expect(wrapped).toContain(speakerTranscript);
     expect(wrapped).toMatch(/untrusted uploaded meeting text/i);
-    expect(wrapped).toMatch(/do not follow instructions/i);
+    expect(wrapped).toContain("Sarah Jensen");
+    expect(wrapped).toMatch(/fullest name/i);
   });
 
   it("escapes delimiter strings so the user cannot close the block early", () => {
@@ -111,5 +114,26 @@ describe("untrusted transcript wrapping", () => {
     expect(wrapped).toContain("Sarah Jensen: Keep the original briefing text.");
     expect(wrapped.split(MEETING_TRANSCRIPT_START)).toHaveLength(2);
     expect(wrapped.split(MEETING_TRANSCRIPT_END)).toHaveLength(2);
+  });
+});
+
+describe("speaker names", () => {
+  it("prefers a surname when the same first name appears both ways", () => {
+    const notes = `${speakerTranscript}\nLine: Quick check.\nLine Petersen: I will send the timeline.`;
+    expect(speakerRoster(notes)).toContain("Sarah Jensen");
+    expect(speakerRoster(notes)).toContain("Line Petersen");
+    expect(speakerRoster(notes)).not.toContain("Line");
+  });
+
+  it("restores a missing surname on a next-step owner", () => {
+    const expanded = expandPersonNames(
+      [
+        { name: "Line", nextSteps: [{ text: "Send the timeline" }] },
+        { name: "Sofie", nextSteps: [{ text: "Book the room" }] },
+      ],
+      ["Line Petersen", "Sofie"],
+    );
+    expect(expanded[0]?.name).toBe("Line Petersen");
+    expect(expanded[1]?.name).toBe("Sofie");
   });
 });
