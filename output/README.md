@@ -143,3 +143,5 @@ npm run deploy
 `TURNSTILE_HOSTNAMES` and `RESEND_TEMPLATE_ID` are plain vars in `wrangler.jsonc`.
 
 `npm run deploy` builds the app and publishes the Worker. After `wrangler secret put`, run `npm run deploy` (or at least `npm run build` first). Otherwise Cloudflare can publish the Vite source page and the window will not load.
+
+Cloudflare Workers Builds must use **root directory `output`**, build command `npm ci && npm run build`, and deploy command `npx wrangler deploy`. If those stay at the repo root with an empty build step, Wrangler auto-configures a static Worker and uploads the Vite source under `output/`, which takes the live site down. The `wrangler.jsonc` at the repository root exists so that mistake fails the build instead of publishing `/src/main.tsx`.
