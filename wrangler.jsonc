@@ -1,0 +1,32 @@
+{
+	// Stops Workers Builds from auto-configuring a static Worker at the repo root.
+	// Local development still uses output/wrangler.jsonc (`cd output && npm run dev`).
+	"$schema": "https://unpkg.com/wrangler@4.131.1/config-schema.json",
+	"name": "meeting-intelligence",
+	"main": "output/worker/index.ts",
+	"compatibility_date": "2026-09-13",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"directory": "./output/dist/client",
+		"not_found_handling": "single-page-application",
+		"run_worker_first": ["/api/*", "/examples/*"]
+	},
+	"observability": {
+		"enabled": true
+	},
+	"vars": {
+		"TURNSTILE_HOSTNAMES": "meeting-intelligence.victorscheike.com",
+		"RESEND_TEMPLATE_ID": "meeting-brief"
+	},
+	"ratelimits": [
+		{
+			"name": "EMAIL_RATE_LIMIT",
+			"namespace_id": "2001",
+			"simple": {
+				"limit": 5,
+				"period": 60
+			}
+		}
+	],
+	"upload_source_maps": true
+}
